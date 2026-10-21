@@ -80,13 +80,13 @@ PROJECTS.forEach((p,i)=>{
     <button class="btn" data-id="${p.id}" aria-haspopup="dialog">${p.btn}</button></div></article>`);
 });
 /* Missing card image -> tidy typographic tile (no placeholder wording) */
-grid.querySelectorAll(".frame img").forEach(im=>{
+try{ grid.querySelectorAll(".frame img").forEach(im=>{
   const fb=()=>{const t=document.createElement("div");t.className="tcard";t.setAttribute("aria-hidden","true");t.textContent=im.closest("article").querySelector("h3").textContent;im.closest(".frame").replaceWith(t)};
   im.addEventListener("error",()=>{ if(!retry(im)) fb(); }); if(im.complete&&im.naturalWidth===0&&!retry(im)) fb();
-});
+}); }catch(e){}
 /* Optional portrait: hide the Polaroid until assets/images/rheyya-portrait.webp exists */
 const pf=document.querySelector(".polaroid img");
-if(pf){const hide=()=>pf.closest(".polaroid").remove(); pf.addEventListener("error",hide); if(pf.complete&&pf.naturalWidth===0) hide();}
+try{ if(pf){const hide=()=>pf.closest(".polaroid").remove(); pf.addEventListener("error",hide); if(pf.complete&&pf.naturalWidth===0) hide();} }catch(e){}
 
 /* ===== PROJECT SHEET (native <dialog>: focus trap + Esc built in) ===== */
 const sheet = document.getElementById("sheet");
@@ -131,7 +131,7 @@ function open(id, push=true){
     im.closest("figure").remove(); const s=sheet.querySelector(".shots");
     if(s && !s.children.length){ s.previousElementSibling.remove(); s.remove(); }
   }));
-  sheet.classList.toggle("wide",!!p.pair); sheet.showModal(); sheet.scrollTop = 0;
+  sheet.classList.toggle("wide",!!p.pair); (sheet.showModal?sheet.showModal():sheet.setAttribute("open","")); sheet.scrollTop = 0;
   if(push) history.replaceState(null,"","#"+id);
 }
 grid.addEventListener("click",e=>{const b=e.target.closest("[data-id]"); if(b){opener=b; open(b.dataset.id);}});
@@ -155,7 +155,7 @@ sheet.addEventListener("click",e=>{
   sheet.querySelectorAll(".zoom").forEach(x=>{ if(!seen.has(x.dataset.src)){ seen.add(x.dataset.src);
     items.push({src:x.dataset.src, alt:x.dataset.alt, cap:(x.closest("figure")?.querySelector("figcaption")?.textContent||"").trim()}); }});
   lbOpener = b; show(items.findIndex(i=>i.src===b.dataset.src));
-  document.body.classList.add("lb-open"); lb.showModal();
+  document.body.classList.add("lb-open"); (lb.showModal?lb.showModal():lb.setAttribute("open",""));
 });
 lb.addEventListener("click",e=>{
   if(e.target.closest(".lb-x")) return lb.close();
